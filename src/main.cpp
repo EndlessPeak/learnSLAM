@@ -5,26 +5,12 @@
 #include <argparse/argparse.hpp>
 #include "camera_calibration.h"
 
-int set_argument_calibrate(argparse::ArgumentParser &parser){
-    //add position argument
-    parser.add_argument("-w","--width")
-        .help("input chessboard width")
-        .scan<'i', int>();
-
-    parser.add_argument("-h","--height")
-        .help("input chessboard height")
-        .scan<'i', int>();
-
-    parser.add_argument("-s","--square_size")
-        .help("input chessboard square size")
-        .scan<'g', float>();
-
-    return 0;
-}
-
 int parse_argument(std::vector<std::unique_ptr<argparse::ArgumentParser>>& parsers, int argc, char* argv[]){
     // 获取主要 parser
+    // 不能将其从 parser 集合中去除，否则后续所有子 parser 均未命中时，主要 parser 已被销毁，会报错
     argparse::ArgumentParser& main_parser = *parsers[0]; // 解引用 unique_ptr 获取对象引用
+
+    // 使用主要 parser 解析
     try {
         main_parser.parse_args(argc, argv);
     }
@@ -35,27 +21,17 @@ int parse_argument(std::vector<std::unique_ptr<argparse::ArgumentParser>>& parse
         return 1;
     }
 
-    // 获取子 parser
+    // 获取子 parser 并从 parser 集合中去除
     argparse::ArgumentParser& calibrate_parser = *parsers[1]; // 解引用 unique_ptr 获取对象引用
+
+    // 命中子 parser，使用子 parser 解析
     if (main_parser.is_subcommand_used("calibrate_camera")) {
-        try {
-            auto width = calibrate_parser.get<int>("--width");
-            auto height = calibrate_parser.get<int>("--height");
-            auto square_size = calibrate_parser.get<float>("--square_size");
-            CalibrateCamera(width, height, square_size);
-        }
-        catch (const std::exception& err){
-            std::cerr << err.what() << "\n";
-            std::cerr << calibrate_parser << std::endl;
-            // std::cout << "Error in Parser." << std::endl;
-            return 1;
-        }
-        return 0;
+        return parse_argument_calibrate(calibrate_parser);
     }
 
     // 所有子 parser 均未命中
     std::cerr << main_parser << std::endl;
-    return 1;
+    return -1;
 }
 
 int main(int argc,char *argv[]){

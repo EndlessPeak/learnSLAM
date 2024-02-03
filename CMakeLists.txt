@@ -12,7 +12,7 @@ include_directories(
 )
 
 add_executable(${PROJECT_NAME}
-        src/learnSLAM.cpp
+        src/main.cpp
         src/eigen_matrix/eigen_matrix.cpp
         src/camera_calibration/camera_calibration.cpp
         include/camera_calibration/camera_calibration.h

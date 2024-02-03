@@ -10,6 +10,8 @@
 #include <vector>
 #include <filesystem>
 
-int CalibrateCamera(int chessboard_width,int chessboard_height,float square_size);
+int set_argument_calibrate(argparse::ArgumentParser& parser);
+int parse_argument_calibrate(argparse::ArgumentParser& parser);
+int CalibrateCamera(int chessboard_width,int chessboard_height,float square_size,std::string& image_location);
 
 #endif //LEARNSLAM_CAMERA_CALIBRATION_H
