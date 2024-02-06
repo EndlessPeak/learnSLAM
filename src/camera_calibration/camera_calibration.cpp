@@ -1,10 +1,9 @@
-#include <argparse/argparse.hpp>
 #include "camera_calibration.h"
 
 /* @brief 设置关于相机标定部分的参数
  * @param argparse::ArgumentParser 解析器对象
  * */
-int set_argument_calibrate(argparse::ArgumentParser& parser){
+int set_argument_calibrate_camera(argparse::ArgumentParser& parser){
     parser.add_description("Calibrate the camera with images.");
     // 添加带数据的参数
     parser.add_argument("-w","--width")
@@ -36,7 +35,7 @@ int set_argument_calibrate(argparse::ArgumentParser& parser){
 /* @brief 解析关于相机标定部分的参数
  * @param argparse::ArgumentParser 解析器对象
  * */
-int parse_argument_calibrate(argparse::ArgumentParser& parser){
+int parse_argument_calibrate_camera(argparse::ArgumentParser& parser){
     try {
         auto width = parser.get<int>("--width");
         auto height = parser.get<int>("--height");

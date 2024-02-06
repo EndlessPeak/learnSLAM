@@ -4,6 +4,7 @@
 
 #include <argparse/argparse.hpp>
 #include "camera_calibration.h"
+#include "eigen_geometry_parser.h"
 
 int parse_argument(std::vector<std::unique_ptr<argparse::ArgumentParser>>& parsers, int argc, char* argv[]){
     // 获取主要 parser
@@ -21,12 +22,17 @@ int parse_argument(std::vector<std::unique_ptr<argparse::ArgumentParser>>& parse
         return 1;
     }
 
-    // 获取子 parser 并从 parser 集合中去除
-    argparse::ArgumentParser& calibrate_parser = *parsers[1]; // 解引用 unique_ptr 获取对象引用
+    // 获取子 parser
+    // 解引用 unique_ptr 获取对象引用
+    argparse::ArgumentParser& calibrate_camera_parser = *parsers[1];
+    argparse::ArgumentParser& use_eigen_parser = *parsers[2];
 
     // 命中子 parser，使用子 parser 解析
     if (main_parser.is_subcommand_used("calibrate_camera")) {
-        return parse_argument_calibrate(calibrate_parser);
+        return parse_argument_calibrate_camera(calibrate_camera_parser);
+    }
+    else if (main_parser.is_subcommand_used("eigen_geometry")) {
+        return parse_argument_eigen_geometry(use_eigen_parser);
     }
 
     // 所有子 parser 均未命中
@@ -47,13 +53,20 @@ int main(int argc,char *argv[]){
     // 禁用子命令的帮助和版本
     auto calibrate_camera =  std::make_unique<argparse::ArgumentParser>("calibrate_camera",\
     "V0.1", argparse::default_arguments::none);
+    auto eigen_geometry = std::make_unique<argparse::ArgumentParser>("eigen_geometry", \
+    "V0.1",argparse::default_arguments::none);
 
-    set_argument_calibrate(*calibrate_camera);
+    // 设置子 parser
+    // 向主 parser 添加子 parser
+    set_argument_calibrate_camera(*calibrate_camera);
     (*program).add_subparser(*calibrate_camera);
+    set_argument_eigen_geometry(*eigen_geometry);
+    (*program).add_subparser(*eigen_geometry);
 
     std::vector<std::unique_ptr<argparse::ArgumentParser>> parsers;
     parsers.push_back(std::move(program));
     parsers.push_back(std::move(calibrate_camera));
+    parsers.push_back(std::move(eigen_geometry));
 
     parse_argument(parsers,argc,argv);
 }
